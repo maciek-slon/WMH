@@ -14,7 +14,7 @@ function main(filename)
 			probs = cumsum(stinks.*dists);
 			x = rand * probs(end);
 			index = find(probs>x, 1);
-			ant(i) = next_city = available_cities(index);
+			ant(i) = available_cities(index);
 		end
 		ant(end) = ant(1);
 		
