@@ -1,12 +1,12 @@
-function [ddd, aaa] = main(filename, type='euc') 
+function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink_fade = 0.95, stink_power = 0.1) 
 	
 	fprintf(2, "Loading cities and computing distances...\n");
 	[d, s, n, c] = load_cities(filename, type);
 	
-	number_of_rounds_in_history_of_world = 100;
-	number_of_the_ants_in_our_universe = 5;
+	number_of_rounds_in_history_of_world = 50;
+	number_of_the_ants_in_our_universe = 30;
 	
-	shortest_tab = [];
+	shortest_tab = zeros(1, number_of_rounds_in_history_of_world);
 	
 	last_shortest = 0;
 	
@@ -15,7 +15,13 @@ function [ddd, aaa] = main(filename, type='euc')
 	
 	fprintf(2, "Job started...\n");
 	
+	total_time = 0;
+	
 	for round=1:number_of_rounds_in_history_of_world
+		
+		tic;
+		
+		current_dists = zeros(1, number_of_the_ants_in_our_universe);
 		
 		ants = prepare_ant(number_of_the_ants_in_our_universe, n);
 		available_cities = repmat(1:n, number_of_the_ants_in_our_universe, 1);
@@ -23,7 +29,7 @@ function [ddd, aaa] = main(filename, type='euc')
 		
 		% compute next step for every ant
 		for step=2:n
-			new_available_cities = [];
+			new_available_cities = zeros(number_of_the_ants_in_our_universe, n-step+1);
 		
 			for ant=1:number_of_the_ants_in_our_universe
 				last_city = ants(ant,step-1);
@@ -31,35 +37,45 @@ function [ddd, aaa] = main(filename, type='euc')
 				av_cities(av_cities == last_city) = [];
 				
 				stinks = s(last_city,av_cities);
-				dists = d(last_city,av_cities).^-1;
-				probs = cumsum(stinks.*dists);
+				dists = d(last_city,av_cities);
+				probs = cumsum(stinks./dists);
 				x = rand * probs(end);
 				index = find(probs>=x, 1);
-				% if size(index) < 1
-					% index
-					% probs
-					% x
-				% end
 				ants(ant,step) = av_cities(index);
-				new_available_cities = [new_available_cities;av_cities];
+				new_available_cities(ant,:) = av_cities;
+				
+				current_dists(ant) = current_dists(ant) + d(last_city, av_cities(index));
 			end
 			available_cities = new_available_cities;
 		end
 		
-		s = s * 0.95;
-				
 		local_shortest = 10000000000;
 		local_ant = 0;
 		for ant=1:number_of_the_ants_in_our_universe
-			dist = 0;
-			for i=2:n+1
-				dist = dist + d(ants(ant,i-1), ants(ant,i));
-			end	
-			if dist < local_shortest
-				local_shortest = dist;
+			current_dists(ant) = current_dists(ant) + d(ants(ant, end), ants(ant, end-1));
+			
+			if current_dists(ant) < local_shortest
+				local_shortest = current_dists(ant);
 				local_ant = ant;
 			end
 		end
+		
+		s = s * 0.95;
+		
+		% local_shortest = 10000000000;
+		% local_ant = 0;
+		% for ant=1:number_of_the_ants_in_our_universe
+			% dist = 0;
+			% for i=2:n+1
+				% dist = dist + d(ants(ant,i-1), ants(ant,i));
+			% end	
+			% if dist < local_shortest
+				% local_shortest = dist;
+				% local_ant = ant;
+			% end
+		% end
+		
+		% [local_shortest, local_ant] = min(current_dists);
 		
 		for i=2:n+1
 			c1 = ants(local_ant, i-1);
@@ -72,6 +88,7 @@ function [ddd, aaa] = main(filename, type='euc')
 		if local_shortest < shortest
 			aaa = ants(local_ant,:);
 			shortest = local_shortest;
+			best_round = round;
 		end
 		
 		
@@ -84,9 +101,12 @@ function [ddd, aaa] = main(filename, type='euc')
 		
 		last_shortest = local_shortest;
 		
-		fprintf(2, "After round %d/%d. Shortest: %d (%d) %d\r", round, number_of_rounds_in_history_of_world, shortest, local_shortest, count);
+		total_time = total_time + toc;
+
+		[mm, ss] = calculate_remaining(total_time, round, number_of_rounds_in_history_of_world);
+		fprintf(2, "After round %d/%d. Shortest: %d (%d) %d Time remaining: %d:%02d [~%.2fs/rnd]      \r", round, number_of_rounds_in_history_of_world, shortest, local_shortest, count, mm, ss, total_time/round);
 		
-		shortest_tab = [shortest_tab, local_shortest];
+		shortest_tab(round) = local_shortest;
 		
 		if count > 10
 			break
