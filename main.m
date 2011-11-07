@@ -3,8 +3,8 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 	fprintf(2, "Loading cities and computing distances...\n");
 	[d, s, n, c] = load_cities(filename, type);
 	
-	number_of_rounds_in_history_of_world = 50;
-	number_of_the_ants_in_our_universe = 30;
+	number_of_rounds_in_history_of_world = 1000;
+	number_of_the_ants_in_our_universe = 5;
 	
 	shortest_tab = zeros(1, number_of_rounds_in_history_of_world);
 	
@@ -62,21 +62,6 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 		
 		s = s * 0.95;
 		
-		% local_shortest = 10000000000;
-		% local_ant = 0;
-		% for ant=1:number_of_the_ants_in_our_universe
-			% dist = 0;
-			% for i=2:n+1
-				% dist = dist + d(ants(ant,i-1), ants(ant,i));
-			% end	
-			% if dist < local_shortest
-				% local_shortest = dist;
-				% local_ant = ant;
-			% end
-		% end
-		
-		% [local_shortest, local_ant] = min(current_dists);
-		
 		for i=2:n+1
 			c1 = ants(local_ant, i-1);
 			c2 = ants(local_ant, i);
@@ -108,7 +93,7 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 		
 		shortest_tab(round) = local_shortest;
 		
-		if count > 10
+		if count > 40
 			break
 		end
 		
