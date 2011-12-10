@@ -1,10 +1,10 @@
-function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink_fade = 0.95, stink_power = 0.1) 
+function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000, total_ants = 50) 
 	
 	fprintf(2, "Loading cities and computing distances...\n");
 	[d, s, n, c] = load_cities(filename, type);
 	
-	number_of_rounds_in_history_of_world = 1000;
-	number_of_the_ants_in_our_universe = 50;
+	number_of_rounds_in_history_of_world = total_rounds;
+	number_of_the_ants_in_our_universe = total_ants;
 	
 	shortest_tab = zeros(1, number_of_rounds_in_history_of_world);
 	longest_tab = zeros(1, number_of_rounds_in_history_of_world);
@@ -128,6 +128,18 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 		
 	end
 	
+	nazwa = sprintf("%s-fade-%d-power-%d-ants-%d", filename, stink_fade, stink_power, total_ants)
+	tries = 1;
+	nazwa_folderu = nazwa;
+	while (exist(nazwa_folderu) == 2)
+		printf("%s istnieje\n", nazwa_folderu);
+		nazwa_filderu = sprintf("%s-%d", nazwa, tries);
+		tries = tries + 1;
+	end
+	
+	mkdir(nazwa_folderu);
+	
+	
 	ddd = shortest;
 	plot_best_route(aaa, c(:,2:3));
 	
@@ -137,6 +149,8 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 	plot(longest_tab, "r");
 	
 	fprintf(2, "\n%d rounds in %f seconds\n\n", round, total_time);
+	
+	
 end
 
 % test_16.txt

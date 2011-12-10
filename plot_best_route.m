@@ -10,4 +10,6 @@ function plot_best_route(route, cities)
 	end
 	
 	gplot(A, cities);
+	
+	replot;
 end
