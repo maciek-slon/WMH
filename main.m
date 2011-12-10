@@ -4,19 +4,24 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 	[d, s, n, c] = load_cities(filename, type);
 	
 	number_of_rounds_in_history_of_world = 1000;
-	number_of_the_ants_in_our_universe = 5;
+	number_of_the_ants_in_our_universe = 50;
 	
 	shortest_tab = zeros(1, number_of_rounds_in_history_of_world);
+	longest_tab = zeros(1, number_of_rounds_in_history_of_world);
 	
 	last_shortest = 0;
 	
 	shortest = 10000000000000000000;
 	counter = 0;
 	
-	fprintf(2, "Job started...\n");
+	fprintf(2, "%d ants started...\n", number_of_the_ants_in_our_universe);
 	
 	total_time = 0;
+		
+	clf;
 	
+	offset = 0;
+		
 	for round=1:number_of_rounds_in_history_of_world
 		
 		tic;
@@ -50,6 +55,7 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 		end
 		
 		local_shortest = 10000000000;
+		local_longest = 0;
 		local_ant = 0;
 		for ant=1:number_of_the_ants_in_our_universe
 			current_dists(ant) = current_dists(ant) + d(ants(ant, end), ants(ant, end-1));
@@ -57,6 +63,10 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 			if current_dists(ant) < local_shortest
 				local_shortest = current_dists(ant);
 				local_ant = ant;
+			end
+			
+			if current_dists(ant) > local_longest
+				local_longest = current_dists(ant);
 			end
 		end
 		
@@ -92,18 +102,41 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 		fprintf(2, "After round %d/%d. Shortest: %d (%d) %d Time remaining: %d:%02d [~%.2fs/rnd]      \r", round, number_of_rounds_in_history_of_world, shortest, local_shortest, count, mm, ss, total_time/round);
 		
 		shortest_tab(round) = local_shortest;
+		longest_tab(round) = local_longest;
 		
 		if count > 40
 			break
 		end
+
+		% rr = floor(round/50);
+		% if mod(round, 50) == 0
+			% f = rr*50 - 49 - offset;
+			% t = rr*50;
+			% hold on;
+			% plot( f:t, shortest_tab(f:t), "g");
+			% plot( f:t, longest_tab(f:t), "r");
+			% drawnow;
+			
+			% offset = 1;
+		% end
+		
+		if mod(round, 20) == 0
+			clf;
+			plot_stink(s, c(:,2:3));
+			drawnow;
+		end;
 		
 	end
 	
 	ddd = shortest;
+	plot_best_route(aaa, c(:,2:3));
 	
-	plot(shortest_tab);
+	figure;
+	plot(shortest_tab, "g");
+	hold on;
+	plot(longest_tab, "r");
 	
-	fprintf(2, "\n\n");
+	fprintf(2, "\n%d rounds in %f seconds\n\n", round, total_time);
 end
 
 % test_16.txt

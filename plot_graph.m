@@ -1,16 +1,14 @@
-function plot_graph()
-    n=5;
-    wierzch=rand(n,2);
-    smrod=rand(n,n)*2;
-    smrod=smrod*smrod';
-    smrod=smrod./max(max(smrod));
-    smrod=smrod*1.5;
-    slabe=smrod<0.5;
-    srednie=(smrod<1.0 & smrod>=0.5);
-    mocne=(smrod>=1.0);
-    gplot(slabe,wierzch,'k:*');
+function plot_graph(smrod, wierzch)
+    mm = max(max(smrod));
+	g1 = mm/3;
+	g2 = 2*g1;
+	
+	slabe=smrod<g1;
+    srednie=(smrod<g2 & smrod>=g1);
+    mocne=(smrod>=g2);
+    gplot(slabe,wierzch,'.');
     hold on;
-    gplot(srednie,wierzch,'b--*');
+    gplot(srednie,wierzch,'.');
     hold on;
-    gplot(mocne, wierzch,'r-*');
+    gplot(mocne, wierzch,'r');
 end
