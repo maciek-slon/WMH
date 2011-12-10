@@ -24,7 +24,7 @@ function plot_stink(stink, coords)
 	
 			x = [coords(c1, 1), coords(c2, 1)];
 			y = [coords(c1, 2), coords(c2, 2)];
-			line(x, y, 'color', [col, col, col], 'linewidth', width, 'linestyle', style);
+			line(x, y, 'color', [col, col, col], 'linewidth', width, 'linestyle', style, 'marker', 'o', 'markersize', 1);
 		end
 	end
 

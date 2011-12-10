@@ -1,4 +1,4 @@
-function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000, total_ants = 50) 
+function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', total_ants = 50, stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000) 
 	
 	fprintf(2, "Loading cities and computing distances...\n");
 	[d, s, n, c] = load_cities(filename, type);
@@ -13,6 +13,25 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 	
 	shortest = 10000000000000000000;
 	counter = 0;
+	
+	
+	
+	
+	
+	nazwa = sprintf("%s-fade-%.2f-power-%.2f-ants-%d", filename, stink_fade, stink_power, total_ants)
+	tries = 1;
+	nazwa_folderu = nazwa;
+	while (exist(nazwa_folderu) > 0)
+		printf("%s istnieje\n", nazwa_folderu);
+		nazwa_folderu = sprintf("%s-%d", nazwa, tries);
+		tries = tries + 1;
+	end
+	
+	mkdir(nazwa_folderu);
+	
+	
+	
+	
 	
 	fprintf(2, "%d ants started...\n", number_of_the_ants_in_our_universe);
 	
@@ -120,28 +139,25 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 			% offset = 1;
 		% end
 		
+		nazwa_pliku = "";
 		if mod(round, 20) == 0
 			clf;
 			plot_stink(s, c(:,2:3));
 			drawnow;
+			
+			nazwa_pliku = sprintf("%s/%d.png", nazwa_folderu, round);
+			print(nazwa_pliku);
+			replot;
 		end;
 		
-	end
-	
-	nazwa = sprintf("%s-fade-%d-power-%d-ants-%d", filename, stink_fade, stink_power, total_ants)
-	tries = 1;
-	nazwa_folderu = nazwa;
-	while (exist(nazwa_folderu) == 2)
-		printf("%s istnieje\n", nazwa_folderu);
-		nazwa_filderu = sprintf("%s-%d", nazwa, tries);
-		tries = tries + 1;
-	end
-	
-	mkdir(nazwa_folderu);
-	
+	end	
 	
 	ddd = shortest;
 	plot_best_route(aaa, c(:,2:3));
+	
+	nazwa_pliku = sprintf("%s/best.png", nazwa_folderu);
+	print(nazwa_pliku);
+	replot;
 	
 	figure;
 	plot(shortest_tab, "g");
@@ -149,6 +165,11 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', stink
 	plot(longest_tab, "r");
 	
 	fprintf(2, "\n%d rounds in %f seconds\n\n", round, total_time);
+	
+	cd(nazwa_folderu);
+	
+	save('total.txt', 'aaa', 'shortest_tab', 'longest_tab', 'total_time', 'round');
+	cd("../..");
 	
 	
 end

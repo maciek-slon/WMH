@@ -9,7 +9,5 @@ function plot_best_route(route, cities)
 		A(c2,c1) = 1;
 	end
 	
-	gplot(A, cities);
-	
-	replot;
+	gplot(A, cities, '*-');
 end
