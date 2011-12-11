@@ -1,7 +1,7 @@
-function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', total_ants = 50, stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000) 
+function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, type='euc', total_ants = 50, stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000, initial_stink = 1, headless = 0) 
 	
 	fprintf(2, "Loading cities and computing distances...\n");
-	[d, s, n, c] = load_cities(filename, type);
+	[d, s, n, c] = load_cities(filename, type, initial_stink);
 	
 	number_of_rounds_in_history_of_world = total_rounds;
 	number_of_the_ants_in_our_universe = total_ants;
@@ -89,18 +89,18 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', total
 			end
 		end
 		
-		s = s * 0.95;
+		s = s * stink_fade;
 		
 		for i=2:n+1
 			c1 = ants(local_ant, i-1);
 			c2 = ants(local_ant, i);
 			st = s(c1, c2);
-			s(c1, c2) = st + 0.1;
-			s(c2, c1) = st + 0.1;
+			s(c1, c2) = st + stink_power;
+			s(c2, c1) = st + stink_power;
 		end
 		
 		if local_shortest < shortest
-			aaa = ants(local_ant,:);
+			ret_route = ants(local_ant,:);
 			shortest = local_shortest;
 			best_round = round;
 		end
@@ -139,36 +139,41 @@ function [ddd, aaa, best_round, shortest_tab] = main(filename, type='euc', total
 			% offset = 1;
 		% end
 		
-		nazwa_pliku = "";
-		if mod(round, 20) == 0
-			clf;
-			plot_stink(s, c(:,2:3));
-			drawnow;
-			
-			nazwa_pliku = sprintf("%s/%d.png", nazwa_folderu, round);
-			print(nazwa_pliku);
-			replot;
-		end;
+		if headless == 0
+			nazwa_pliku = "";
+			if mod(round, 1) == 0
+				clf;
+				plot_stink(s, c(:,2:3));
+				drawnow;
+				
+				nazwa_pliku = sprintf("%s/%d.png", nazwa_folderu, round);
+				print(nazwa_pliku);
+				replot;
+			end;
+		end
 		
 	end	
 	
-	ddd = shortest;
-	plot_best_route(aaa, c(:,2:3));
+	ret_distance = shortest;
 	
-	nazwa_pliku = sprintf("%s/best.png", nazwa_folderu);
-	print(nazwa_pliku);
-	replot;
+	if headless == 0
+		plot_best_route(ret_route, c(:,2:3));
 	
-	figure;
-	plot(shortest_tab, "g");
-	hold on;
-	plot(longest_tab, "r");
+		nazwa_pliku = sprintf("%s/best.png", nazwa_folderu);
+		print(nazwa_pliku);
+		replot;
+	
+		figure;
+		plot(shortest_tab, "g");
+		hold on;
+		plot(longest_tab, "r");
+	end
 	
 	fprintf(2, "\n%d rounds in %f seconds\n\n", round, total_time);
 	
 	cd(nazwa_folderu);
 	
-	save('total.txt', 'aaa', 'shortest_tab', 'longest_tab', 'total_time', 'round');
+	save('total.txt', 'ret_route', 'shortest_tab', 'longest_tab', 'total_time', 'round');
 	cd("../..");
 	
 	

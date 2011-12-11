@@ -1,4 +1,4 @@
-function [distances, stink, nr_cities, cities] = load_cities(filename, type='euc')	
+function [distances, stink, nr_cities, cities] = load_cities(filename, type='euc', initial_stink = 1)	
 	% load cities from data file
 	cities = load('-ascii', filename);
 	nr_cities = size(cities,1);
@@ -36,8 +36,12 @@ function [distances, stink, nr_cities, cities] = load_cities(filename, type='euc
 			
 		end
 	end
-	
+
 	% initial feromone values
-	stink = ones(nr_cities, nr_cities);
+	if initial_stink < 0
+		stink = rand(nr_cities, nr_cities);
+	else
+		stink = initial_stink * ones(nr_cities, nr_cities);
+	end
 end
 
