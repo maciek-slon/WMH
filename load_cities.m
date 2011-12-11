@@ -7,6 +7,7 @@ function [distances, stink, nr_cities, cities] = load_cities(filename, type='euc
 	distances = zeros(nr_cities, nr_cities);
 	
 	for x = 2:nr_cities
+		fprintf(2, "%d/%d\r", x, nr_cities);
 		for y = 1:x-1
 			x_1 = cities(x, 2);
 			y_1 = cities(x, 3);
