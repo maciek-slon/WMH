@@ -9,6 +9,7 @@ function [distances, stink, nr_cities, cities] = load_cities(filename, type='euc
 	num_loops = nr_cities * (nr_cities-1) / 2;
 	done_loops = 0;
 
+	distances(1, 1) = 1;
 	for x = 2:nr_cities
 		fprintf(2, "Loading cities and computing distances [%2.0f%%]\r", 100 * done_loops / num_loops);
 		for y = 1:x-1
@@ -39,6 +40,7 @@ function [distances, stink, nr_cities, cities] = load_cities(filename, type='euc
 			end
 
 		end
+		distances(x, x) = 1;
 		done_loops = done_loops + x - 1;
 	end
 

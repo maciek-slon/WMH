@@ -40,42 +40,60 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 
 	offset = 0;
 
+	t1 = 0;
+	t2 = 0;
+	t3 = 0;
+	t4 = 0;
+	
 	for round=1:number_of_rounds_in_history_of_world
 
 		tic;
 
 		current_dists = zeros(1, number_of_the_ants_in_our_universe);
 
+		
 		ants = prepare_ant(number_of_the_ants_in_our_universe, n);
 		available_cities = repmat(1:n, number_of_the_ants_in_our_universe, 1);
 		ants(:,end) = ants(:,1);
 
+		t1 = t1 + toc;
+		
 		global_probs = s./d;
+		
+		t2 = t2 + toc;
 
+		
 		% compute next step for every ant
 		for step=2:n
-			new_available_cities = zeros(number_of_the_ants_in_our_universe, n-step+1);
-
+			%%% new_available_cities = zeros(number_of_the_ants_in_our_universe, n-step+1);
 
 			for ant=1:number_of_the_ants_in_our_universe
+	
 				last_city = ants(ant,step-1);
-				av_cities =	available_cities(ant,:);
-				av_cities(av_cities == last_city) = [];
+				%%% av_cities =	available_cities(ant,:);
+				%%% av_cities(av_cities == last_city) = [];
+				available_cities(ant,last_city) = 0;
 
 				%stinks = s(last_city,av_cities);
 				%dists = d(last_city,av_cities);
 				%probs = cumsum(stinks./dists);
-				probs = cumsum(global_probs(last_city, av_cities));
+				
+				pr = global_probs(last_city, :) .* available_cities(ant, :);
+				%%% probs = cumsum(global_probs(last_city, av_cities));
+				probs = cumsum(pr);
 				x = rand * probs(end);
 				index = find(probs>=x, 1);
-				ants(ant,step) = av_cities(index);
-				new_available_cities(ant,:) = av_cities;
+				%%% ants(ant,step) = av_cities(index);
+				ants(ant,step) = index;
+				%%% new_available_cities(ant,:) = av_cities;
 
-				current_dists(ant) = current_dists(ant) + d(last_city, av_cities(index));
+				current_dists(ant) = current_dists(ant) + d(last_city, index);
 			end
-			available_cities = new_available_cities;
+			%%% available_cities = new_available_cities;
 		end
 
+		t3 = t3 + toc;
+		
 		local_shortest = 10000000000;
 		local_longest = 0;
 		local_ant = 0;
@@ -102,6 +120,8 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 			s(c2, c1) = st + stink_power;
 		end
 
+		t4 = t4 + toc;
+		
 		if local_shortest < shortest
 			ret_route = ants(local_ant,:);
 			shortest = local_shortest;
@@ -119,9 +139,14 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 		last_shortest = local_shortest;
 
 		total_time = total_time + toc;
+		
+		tt1 = t1 / round;
+		tt2 = t2 / round - tt1;
+		tt3 = t3 / round - tt1 - tt2;
+		tt4 = t4 / round - tt1 - tt2 - tt3;
 
 		[mm, ss] = calculate_remaining(total_time, round, number_of_rounds_in_history_of_world);
-		fprintf(2, "After round %d/%d. Shortest: %d (%d) %d Time remaining: %d:%02d [~%.2fs/rnd]      \r", round, number_of_rounds_in_history_of_world, shortest, local_shortest, count, mm, ss, total_time/round);
+		fprintf(2, "After round %d/%d. Shortest: %d (%d) %d Time remaining: %d:%02d [~%.2fs/rnd] %.2f %.2f %.2f %.2f     \r", round, number_of_rounds_in_history_of_world, shortest, local_shortest, count, mm, ss, total_time/round, tt1, tt2, tt3, tt4);
 
 		shortest_tab(round) = local_shortest;
 		longest_tab(round) = local_longest;
