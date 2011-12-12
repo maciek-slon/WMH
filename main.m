@@ -53,7 +53,8 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 
 		
 		ants = prepare_ant(number_of_the_ants_in_our_universe, n);
-		available_cities = repmat(1:n, number_of_the_ants_in_our_universe, 1);
+		%%% available_cities = repmat(1:n, number_of_the_ants_in_our_universe, 1);
+		available_cities = ones(number_of_the_ants_in_our_universe, n);
 		ants(:,end) = ants(:,1);
 
 		t1 = t1 + toc;
@@ -171,7 +172,7 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 
 		if headless == 0
 			nazwa_pliku = "";
-			if mod(round, 1) == 0
+			if mod(round, 20) == 0
 				clf;
 				plot_stink(s, c(:,2:3));
 				drawnow;
