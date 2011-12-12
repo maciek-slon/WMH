@@ -59,6 +59,8 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 		t1 = t1 + toc;
 		
 		global_probs = s./d;
+		pr = global_probs(1, :);
+		probs = pr;
 		
 		t2 = t2 + toc;
 
