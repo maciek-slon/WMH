@@ -49,7 +49,7 @@ function [distances, stink, nr_cities, cities] = load_cities(filename, type='euc
 		fprintf(2, "random stink\n");
 		stink = rand(nr_cities, nr_cities);
 	else
-		fprintf(2, "stink: %d\n", initial_stink);
+		fprintf(2, "stink: %f\n", initial_stink);
 		stink = initial_stink * ones(nr_cities, nr_cities);
 	end
 end

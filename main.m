@@ -1,4 +1,4 @@
-function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, type='euc', total_ants = 50, stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000, initial_stink = 1, headless = 0)
+function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, type='euc', total_ants = 50, stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000, initial_stink = 1, showevery = 20)
 
 	[d, s, n, c] = load_cities(filename, type, initial_stink);
 
@@ -170,9 +170,9 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 			% offset = 1;
 		% end
 
-		if headless == 0
+		if showevery > 0
 			nazwa_pliku = "";
-			if mod(round, 20) == 0
+			if mod(round, showevery) == 0
 				clf;
 				plot_stink(s, c(:,2:3));
 				drawnow;
@@ -187,7 +187,7 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 
 	ret_distance = shortest;
 
-	if headless == 0
+	if showevery > 0
 		plot_best_route(ret_route, c(:,2:3));
 
 		nazwa_pliku = sprintf("%s/best.png", nazwa_folderu);
