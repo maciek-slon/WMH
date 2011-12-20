@@ -1,4 +1,4 @@
-function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, type='euc', total_ants = 50, stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000, initial_stink = 1, showevery = 20)
+function [ret_distance, ret_route, best_round, shortest_tab, rounds] = main(filename, type='euc', total_ants = 50, stink_fade = 0.95, stink_power = 0.1, total_rounds = 1000, initial_stink = 1, showevery = 20)
 
 	[d, s, n, c] = load_cities(filename, type, initial_stink);
 
@@ -201,7 +201,8 @@ function [ret_distance, ret_route, best_round, shortest_tab] = main(filename, ty
 	end
 
 	fprintf(2, "\n%d rounds in %f seconds\n\n", round, total_time);
-
+	rounds = round;
+	
 	cd(nazwa_folderu);
 
 	save('total.txt', 'ret_route', 'shortest_tab', 'longest_tab', 'total_time', 'round');
